@@ -69,25 +69,20 @@ fun SecondScreen() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
+                        Image(
                             modifier = Modifier.size(40.dp),
                             painter = rememberVectorPainter(image = Icons.Filled.DateRange),
                             contentDescription = "Date Icon"
                         )
-                    }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
+                        Image(
                             modifier = Modifier.size(40.dp),
                             painter = rememberVectorPainter(image = Icons.Filled.Home),
                             contentDescription = "Home Icon"
                         )
-                    }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            modifier = Modifier.size(40.dp),
-                            painter = rememberVectorPainter(image = Icons.Filled.AccountCircle),
-                            contentDescription = "Account Icon"
+                        Image(
+                                modifier = Modifier.size(40.dp),
+                        painter = rememberVectorPainter(image = Icons.Filled.AccountCircle),
+                        contentDescription = "Account Icon"
                         )
                     }
                 }

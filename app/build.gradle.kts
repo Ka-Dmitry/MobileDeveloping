@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.mobiledeveloping"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.mobiledeveloping"
         minSdk = 28
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -52,6 +52,7 @@ android {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
+    implementation("com.android.volley:volley:1.2.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.5")
     implementation("androidx.activity:activity-compose:1.9.2")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))

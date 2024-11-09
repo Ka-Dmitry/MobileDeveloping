@@ -23,7 +23,12 @@ import com.example.mobiledeveloping.screens.DialogSearch
 import com.example.mobiledeveloping.screens.MainCard
 import com.example.mobiledeveloping.screens.TabLayout
 import com.example.mobiledeveloping.ui.theme.MobileDevelopingTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONObject
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 const val API_KEY = "1044380fbee74d72847160415240811"
 
@@ -45,7 +50,7 @@ class MainActivity : ComponentActivity() {
                             "",
                             "0.0",
                             "0.0",
-                            "",
+                            listOf(),
                         )
                     )
                 }
@@ -82,33 +87,42 @@ class MainActivity : ComponentActivity() {
 
 
 private fun getData(
-    city: String,
-    context: Context,
+    city: String, context: Context,
     daysList: MutableState<List<WeatherModel>>,
     currentDay: MutableState<WeatherModel>
 ) {
-    val url = "http://api.weatherapi.com/v1/current.json" +
-            "?key=$API_KEY" +
-            "&q=$city" +
-            "&days=3" +
-            "&aqi=no" +
-            "&alerts=no"
-    val queue = Volley.newRequestQueue(context)
-    val sRequest = StringRequest(
-        Request.Method.GET,
-        url,
-        { response ->
-            // Log.d("MyLog", "Response $response")
-            val list = getWeatherByDays(response)
-            currentDay.value = list[0]
-            daysList.value = list
-        },
-        {
-            Log.d("MyLog", "VolleyError $it")
+    val retrofit: Retrofit = Retrofit.Builder()
+        .baseUrl("https://api.weatherapi.com/v1/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    val service: WeatherApi = retrofit.create(WeatherApi::class.java)
+
+    val job = CoroutineScope(Dispatchers.IO).launch() {
+        val weather = service.getWeather(city)
+
+        daysList.value = weather.forecast.forecastday.map { forecastDay ->
+            WeatherModel(
+                city = weather.location.name,
+                time = forecastDay.date,
+                currentTemp = "",
+                condition = forecastDay.day.condition.text,
+                icon = forecastDay.day.condition.icon,
+                maxTemp = forecastDay.day.maxTemp.toFloat().toInt().toString() + "°C",
+                minTemp = forecastDay.day.minTemp.toFloat().toInt().toString() + "°C",
+                hours = forecastDay.hour
+            )
         }
-    )
-    queue.add(sRequest)
+
+        currentDay.value = daysList.value.first().copy(
+            time = weather.current.time,
+            currentTemp = weather.current.currentTemp.toFloat().toInt().toString() + "°C",
+        )
+    }
+
+    job //Можно проверить на ошибку
 }
+
 
 private fun getWeatherByDays(response: String): List<WeatherModel> {
     if (response.isEmpty()) return listOf()
@@ -128,7 +142,7 @@ private fun getWeatherByDays(response: String): List<WeatherModel> {
                 item.getJSONObject("day").getJSONObject("condition").getString("icon"),
                 item.getJSONObject("day").getString("maxtemp_c"),
                 item.getJSONObject("day").getString("mintemp_c"),
-                item.getJSONArray("hour").toString()
+                listOf()
             )
         )
     }

@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.mobiledeveloping.R
+import com.example.mobiledeveloping.data.HourDto
 import com.example.mobiledeveloping.data.WeatherModel
 import com.example.mobiledeveloping.ui.theme.BlueLight
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -194,24 +195,26 @@ fun TabLayout(daysList: MutableState<List<WeatherModel>>, currentDay: MutableSta
     }
 }
 
-private fun getWeatherByHours(hours: String): List<WeatherModel> {
+private fun getWeatherByHours(hours: List<HourDto>): List<WeatherModel> {
     if (hours.isEmpty()) return listOf()
-    val hoursArray = JSONArray(hours)
+
     val list = ArrayList<WeatherModel>()
-    for (i in 0 until hoursArray.length()) {
-        val item = hoursArray[i] as JSONObject
+
+    hours.forEach { item ->
+
         list.add(
             WeatherModel(
-                "",
-                item.getString("time"),
-                item.getString("temp_c").toFloat().toInt().toString() + "°C",
-                item.getJSONObject("condition").getString("text"),
-                item.getJSONObject("condition").getString("icon"),
-                "",
-                "",
-                ""
+                city = "",
+                time = item.time,
+                currentTemp = item.tempC.toFloat().toInt().toString() + "°C",
+                condition = item.condition.text,
+                icon = item.condition.icon,
+                maxTemp = "",
+                minTemp = "",
+                hours = listOf()
             )
         )
+
     }
     return list
 }
